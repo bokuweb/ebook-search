@@ -18,19 +18,31 @@
   eBookApp.factory('Ebook', function($http, $q) {
     var Ebook;
     Ebook = (function() {
-      var GOOGLE_FEED_URI, _getJSON;
+      var GOOGLE_FEED_URI, NUM, _getJSON, _validateTitle;
 
       function Ebook() {}
 
-      GOOGLE_FEED_URI = "http://ajax.googleapis.com/ajax/services/feed/load?&v=1.0&output=json&callback=JSON_CALLBACK&num=40&q=";
+      NUM = 20;
+
+      GOOGLE_FEED_URI = "http://ajax.googleapis.com/ajax/services/feed/load?&v=1.0&output=json&callback=JSON_CALLBACK&num=" + NUM + "&q=";
 
       Ebook.prototype.search = function(word) {
-        var deferred, uri;
+        var books, deferred, uri;
         deferred = $q.defer();
-        uri = GOOGLE_FEED_URI + encodeURIComponent("http://hon.jp/rest/2.1/" + word + "/ehonsearch/xslt=http://hon.jp/csv/rest_xslsample/sample_20_rss2.xsl&max=20");
+        uri = GOOGLE_FEED_URI + encodeURIComponent("http://hon.jp/rest/2.1/" + word + "/ehonsearch/xslt=http://hon.jp/csv/rest_xslsample/sample_20_rss2.xsl&max=" + NUM);
+        books = [];
         _getJSON(uri).then(function(res) {
+          var v, _i, _len, _ref;
           if (res.responseStatus === 200) {
-            return deferred.resolve(res.responseData.feed.entries);
+            _ref = res.responseData.feed.entries;
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              v = _ref[_i];
+              if (_validateTitle(v.title, word) !== -1) {
+                books.push(v);
+              }
+            }
+            console.dir(books);
+            return deferred.resolve(books);
           } else {
             return deferred.resolve("none");
           }
@@ -50,6 +62,11 @@
           return deferred.resolve(data);
         });
         return deferred.promise;
+      };
+
+      _validateTitle = function(title, word) {
+          console.log(title +" / " +  word + title.indexOf(word))
+          return title.indexOf(word);
       };
 
       return Ebook;
