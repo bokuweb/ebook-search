@@ -18,7 +18,7 @@
             <form id="form" role="form">
                 <div class="form-group move-down">
                     <span>電子書籍検索</span>
-                    <input type="text" id="Autocomplete" class="form-control" ng-change="onChange()" ng-model="search" ng-model-options="{ updateOn: 'default blur', debounce: {'default': 500, 'blur': 0} }"/>
+                    <input type="text" id="Autocomplete" class="form-control" ng-change="onChange()" ng-model="searchWord" ng-model-options="{ updateOn: 'default blur', debounce: {'default': 200, 'blur': 0} }"/>
                 </div>
                 <div ng-repeat=" v in res">
                     <span class="title">{{v.title}}</span>

@@ -6,29 +6,44 @@
 
   eBookApp.controller('MainCtrl', function($scope, $http, Ebook) {
     return $scope.onChange = function() {
-      return Ebook.getJSON($scope.search).then(function(data) {
-        if (data.responseStatus === 200) {
-          return $scope.res = data.responseData.feed.entries;
-        }
-      });
+      var res;
+      res = Ebook.search($scope.searchWord);
+      if (res !== "none") {
+        return $scope.res = res;
+      }
     };
   });
 
   eBookApp.factory('Ebook', function($http, $q) {
     var Ebook;
     Ebook = (function() {
+      var GOOGLE_FEED_URI, _getJSON;
+
       function Ebook() {}
 
-      Ebook.prototype.getJSON = function(word) {
-        var $uri, config, deferred;
+      GOOGLE_FEED_URI = "http://ajax.googleapis.com/ajax/services/feed/load?&v=1.0&output=json&callback=JSON_CALLBACK&num=40&q=";
+
+      Ebook.prototype.search = function(word) {
+        var uri;
+        uri = GOOGLE_FEED_URI + encodeURIComponent("http://hon.jp/rest/2.1/" + word + "/ehonsearch/xslt=http://hon.jp/csv/rest_xslsample/sample_20_rss2.xsl&max=20");
+        return _getJSON(uri).then(function(res) {
+          if (res.responseStatus === 200) {
+            return res.responseData.feed.entries;
+          } else {
+            return "none";
+          }
+        });
+      };
+
+      _getJSON = function(uri) {
+        var config, deferred;
         deferred = $q.defer();
-        $uri = "http://ajax.googleapis.com/ajax/services/feed/load?&v=1.0&output=json&callback=JSON_CALLBACK&num=40&q=" + encodeURIComponent("http://hon.jp/rest/2.1/" + word + "/ehonsearch/xslt=http://hon.jp/csv/rest_xslsample/sample_20_rss2.xsl&max=20");
         config = {
           params: {
             timeout: 10000
           }
         };
-        $http.jsonp($uri, config).success(function(data) {
+        $http.jsonp(uri, config).success(function(data) {
           return deferred.resolve(data);
         });
         return deferred.promise;
