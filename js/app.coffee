@@ -8,12 +8,14 @@ eBookApp.controller 'MainCtrl', ($scope, $http, Ebook)->
 # factory
 eBookApp.factory 'Ebook', ($http, $q)->
   class Ebook
-    NUM = 20
+    NUM = 100
     GOOGLE_FEED_URI = "http://ajax.googleapis.com/ajax/services/feed/load?&v=1.0&output=json&callback=JSON_CALLBACK&num="+NUM+"&q="
+    XSLT_URI = "http://hon.jp/csv/rest_xslsample/sample_20_rss2.xsl"
+    ID = "ehonsearch"
 
     search : (word)->
       deferred = $q.defer()
-      uri = GOOGLE_FEED_URI + encodeURIComponent("http://hon.jp/rest/2.1/"+word+"/ehonsearch/xslt=http://hon.jp/csv/rest_xslsample/sample_20_rss2.xsl&max="+NUM)
+      uri = GOOGLE_FEED_URI + encodeURIComponent "http://hon.jp/rest/2.1/"+word+"/"+ID+"/xslt="+XSLT_URI+"&max="+NUM
       books = []
       _getJSON(uri).then (res)->
         if res.responseStatus is 200
