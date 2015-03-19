@@ -65,8 +65,9 @@
       };
 
       _validateTitle = function(title, word) {
-          console.log(title +" / " +  word + title.indexOf(word))
-          return title.indexOf(word);
+        var reg;
+        reg = new RegExp(word, "i");
+        return title.search(reg);
       };
 
       return Ebook;

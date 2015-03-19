@@ -32,6 +32,8 @@ eBookApp.factory 'Ebook', ($http, $q)->
         deferred.resolve data
       deferred.promise
 
-    _validateTitle = (title, word)-> title.indexOf word
+    _validateTitle = (title, word)->
+      reg = new RegExp word , "i"
+      title.search reg
 
   new Ebook()
