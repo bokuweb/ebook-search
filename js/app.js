@@ -7,10 +7,11 @@
   eBookApp.controller('MainCtrl', function($scope, $http, Ebook) {
     return $scope.onChange = function() {
       var res;
-      res = Ebook.search($scope.searchWord);
-      if (res !== "none") {
-        return $scope.res = res;
-      }
+      return res = Ebook.search($scope.searchWord).then(function(res) {
+        if (res !== "none") {
+          return $scope.res = res;
+        }
+      });
     };
   });
 
@@ -24,15 +25,17 @@
       GOOGLE_FEED_URI = "http://ajax.googleapis.com/ajax/services/feed/load?&v=1.0&output=json&callback=JSON_CALLBACK&num=40&q=";
 
       Ebook.prototype.search = function(word) {
-        var uri;
+        var deferred, uri;
+        deferred = $q.defer();
         uri = GOOGLE_FEED_URI + encodeURIComponent("http://hon.jp/rest/2.1/" + word + "/ehonsearch/xslt=http://hon.jp/csv/rest_xslsample/sample_20_rss2.xsl&max=20");
-        return _getJSON(uri).then(function(res) {
+        _getJSON(uri).then(function(res) {
           if (res.responseStatus === 200) {
-            return res.responseData.feed.entries;
+            return deferred.resolve(res.responseData.feed.entries);
           } else {
-            return "none";
+            return deferred.resolve("none");
           }
         });
+        return deferred.promise;
       };
 
       _getJSON = function(uri) {
